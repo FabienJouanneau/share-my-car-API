@@ -1,27 +1,34 @@
 package com.fabienjouanneau.sharemycar.website.webServices.user;
 import com.fabienjouanneau.sharemycar.website.webServices.advert.Advert;
 import com.fabienjouanneau.sharemycar.website.webServices.booking.Booking;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference(value = "user-advert")
     private List<Advert> adverts;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonManagedReference(value = "user-booking")
+    @JsonIdentityInfo(
+            scope = Booking.class,
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "bookingId")
     private List<Booking> bookings;
 
     private String firstName;
@@ -47,6 +54,12 @@ public class User {
     private Date drivingLicenceDate;
 
     public User(){}
+
+    public <T> User(String email, String password, Long userId, List<T> emptyList) {
+        this.email = email;
+        this.password = password;
+        this.userId = userId;
+    }
 
     public Long getUserId() {
         return userId;
@@ -102,10 +115,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
@@ -215,4 +224,39 @@ public class User {
     public void setDrivingLicenceDate(Date drivingLicenceDate) {
         this.drivingLicenceDate = drivingLicenceDate;
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }
