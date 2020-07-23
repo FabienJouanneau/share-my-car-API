@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -14,6 +15,14 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    // GET CURRENT USER (CONNEXION)
+    @GetMapping("/me")
+    public User getMe() {
+        User user = userService.getMe();
+        user.setAdverts(new ArrayList<>());
+        user.setBookings(new ArrayList<>());
+        return user;
+    }
     @GetMapping
     public List<User> getAllUsers(){
         return userService.getAllUsers();
@@ -22,7 +31,7 @@ public class UserController {
     public User getUserById(@PathVariable Long id){
         return userService.getUserById(id);
     }
-    @PostMapping
+    @PostMapping("/sign-up")
     public User createUser(@RequestBody User user){
         return userService.postUser(user);
     }
