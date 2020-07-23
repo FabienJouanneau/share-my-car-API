@@ -30,7 +30,10 @@ public class Advert {
     private User user;
 
     @OneToMany(mappedBy = "advert", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference(value = "advert-booking")
+    @JsonIdentityInfo(
+            scope = Booking.class,
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "bookingId")
     private List<Booking> bookings;
 
 
