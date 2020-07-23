@@ -2,6 +2,9 @@ package com.fabienjouanneau.sharemycar.website.webServices.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -12,7 +15,15 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    // GET CURRENT USER (CONNEXION)
+    public User getMe() {
+        Authentication authentication = (Authentication) SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return user;
+    }
     // GET ALL USERS
     public List<User> getAllUsers(){
         return userRepository.findAll();
@@ -27,6 +38,7 @@ public class UserService {
     }
     // POST USER
     public User postUser(User user){
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
     // PUT USER
