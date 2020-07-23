@@ -1,6 +1,7 @@
 package com.fabienjouanneau.sharemycar.website.webServices.booking;
 
 import com.fabienjouanneau.sharemycar.website.webServices.advert.Advert;
+import com.fabienjouanneau.sharemycar.website.webServices.carOption.CarOption;
 import com.fabienjouanneau.sharemycar.website.webServices.user.User;
 import com.fasterxml.jackson.annotation.*;
 
@@ -14,13 +15,20 @@ public class Booking {
     private Long bookingId;
 
     @ManyToOne()
-    @JsonBackReference(value = "user-booking")
-    @JoinColumn(name = "user_id")
+    @JsonIdentityInfo(
+            scope = User.class,
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "userId")
     @JsonIdentityReference(alwaysAsId = true)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne()
-    @JsonBackReference(value = "advert-booking")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIdentityInfo(
+            scope = Advert.class,
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "advertId")
+    @JsonIdentityReference(alwaysAsId = true)
     @JoinColumn(name = "advert_id")
     private Advert advert;
 
